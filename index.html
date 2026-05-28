@@ -36,7 +36,6 @@
     overflow-x: hidden;
   }
 
-  /* Header */
   .header {
     background: linear-gradient(135deg, #F9A8D4 0%, #C084FC 100%);
     padding: 28px 20px 36px;
@@ -82,8 +81,24 @@
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.2); }
   }
+  .header-admin-btn {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    cursor: pointer;
+    z-index: 5;
+    transition: background 0.2s;
+  }
+  .header-admin-btn:active { background: rgba(255,255,255,0.35); }
 
-  /* Cart badge */
   .cart-btn {
     position: fixed;
     bottom: 30px;
@@ -113,15 +128,13 @@
     min-width: 20px;
     height: 20px;
     border-radius: 10px;
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
     padding: 0 4px;
     border: 2px solid white;
-    display: none;
   }
 
-  /* Category tabs */
   .cat-tabs {
     display: flex;
     gap: 10px;
@@ -151,7 +164,6 @@
     box-shadow: 0 4px 14px rgba(244,114,182,0.35);
   }
 
-  /* Section */
   .section { padding: 0 16px 12px; }
   .section-title {
     font-size: 16px;
@@ -164,14 +176,12 @@
   }
   .section-title span { font-size: 18px; }
 
-  /* Grid */
   .items-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
   }
 
-  /* Item card */
   .item-card {
     background: white;
     border-radius: 18px;
@@ -214,8 +224,7 @@
     color: var(--pink);
   }
   .item-add-btn {
-    width: 28px;
-    height: 28px;
+    width: 28px; height: 28px;
     border-radius: 50%;
     background: linear-gradient(135deg, var(--pink), var(--purple));
     color: white;
@@ -242,8 +251,7 @@
     text-align: center;
   }
   .item-minus-btn {
-    width: 24px;
-    height: 24px;
+    width: 24px; height: 24px;
     border-radius: 50%;
     background: var(--pink-light);
     color: var(--pink-dark);
@@ -257,8 +265,7 @@
     font-weight: 500;
   }
   .item-add-sm {
-    width: 24px;
-    height: 24px;
+    width: 24px; height: 24px;
     border-radius: 50%;
     background: linear-gradient(135deg, var(--pink), var(--purple));
     color: white;
@@ -285,7 +292,6 @@
     border-radius: 10px;
   }
 
-  /* Cart drawer */
   .cart-overlay {
     position: fixed;
     inset: 0;
@@ -354,7 +360,6 @@
   }
   .cart-empty-emoji { font-size: 42px; display: block; margin-bottom: 10px; }
 
-  /* Note */
   .note-section {
     padding: 16px 20px;
     border-top: 1px solid var(--pink-light);
@@ -377,7 +382,6 @@
   .note-input:focus { border-color: var(--pink); }
   .note-input::placeholder { color: var(--text-muted); }
 
-  /* Submit */
   .submit-section {
     padding: 12px 20px 0;
     flex-shrink: 0;
@@ -399,7 +403,6 @@
   .submit-btn:active { opacity: 0.9; transform: scale(0.98); }
   .submit-btn:disabled { opacity: 0.5; }
 
-  /* Success modal */
   .success-modal {
     position: fixed;
     inset: 0;
@@ -451,7 +454,6 @@
     margin-top: 10px;
   }
 
-  /* Notification hint */
   .notify-hint {
     margin: 12px 16px;
     background: linear-gradient(135deg, var(--purple-light), var(--pink-light));
@@ -466,7 +468,6 @@
   .notify-hint-text { font-size: 12px; color: #6B21A8; line-height: 1.6; }
   .notify-hint-text strong { font-weight: 600; display: block; margin-bottom: 2px; }
 
-  /* Order history pill */
   .history-btn {
     display: flex;
     align-items: center;
@@ -483,7 +484,6 @@
     cursor: pointer;
   }
 
-  /* History modal */
   .history-modal {
     position: fixed;
     inset: 0;
@@ -558,52 +558,338 @@
     margin-bottom: 80px;
   }
   .hidden { display: none !important; }
+
+  /* ===== Admin Page Styles ===== */
+  .admin-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 500;
+    display: none;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  .admin-overlay.show { display: flex; }
+
+  .admin-header {
+    background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+    padding: 24px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .admin-header-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: white;
+  }
+  .admin-back-btn {
+    padding: 6px 16px;
+    background: rgba(255,255,255,0.2);
+    border: none;
+    border-radius: 20px;
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .admin-back-btn:active { background: rgba(255,255,255,0.3); }
+
+  .admin-body { padding: 16px; flex: 1; }
+
+  .admin-section {
+    background: white;
+    border-radius: 18px;
+    padding: 18px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  }
+  .admin-section-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .admin-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    margin-top: 10px;
+  }
+  .admin-label:first-of-type { margin-top: 0; }
+  .admin-input {
+    width: 100%;
+    height: 42px;
+    border: 1.5px solid var(--pink-mid);
+    border-radius: 12px;
+    padding: 0 14px;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--pink-light);
+    outline: none;
+    font-family: inherit;
+  }
+  .admin-input:focus { border-color: var(--pink); }
+  .admin-textarea {
+    width: 100%;
+    border: 1.5px solid var(--pink-mid);
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--pink-light);
+    outline: none;
+    resize: none;
+    font-family: inherit;
+    line-height: 1.5;
+    min-height: 60px;
+  }
+  .admin-textarea:focus { border-color: var(--pink); }
+  .admin-select {
+    width: 100%;
+    height: 42px;
+    border: 1.5px solid var(--pink-mid);
+    border-radius: 12px;
+    padding: 0 14px;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--pink-light);
+    outline: none;
+    font-family: inherit;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  .admin-row {
+    display: flex;
+    gap: 10px;
+  }
+  .admin-row > * { flex: 1; }
+
+  .admin-btn {
+    width: 100%;
+    height: 44px;
+    border: none;
+    border-radius: 14px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+    margin-top: 12px;
+  }
+  .admin-btn:active { opacity: 0.9; transform: scale(0.98); }
+  .admin-btn-primary {
+    background: linear-gradient(135deg, var(--pink), var(--purple));
+    color: white;
+    box-shadow: 0 4px 14px rgba(244,114,182,0.35);
+  }
+  .admin-btn-secondary {
+    background: var(--pink-light);
+    color: var(--pink-dark);
+  }
+
+  .admin-item-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--pink-light);
+  }
+  .admin-item-row:last-child { border-bottom: none; }
+  .admin-item-emoji { font-size: 24px; flex-shrink: 0; }
+  .admin-item-info { flex: 1; min-width: 0; }
+  .admin-item-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .admin-item-cat {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+  .admin-item-del {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #FEE2E2;
+    color: #DC2626;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: transform 0.15s;
+    line-height: 1;
+  }
+  .admin-item-del:active { transform: scale(0.88); }
+
+  .admin-empty {
+    text-align: center;
+    padding: 24px;
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+
+  .admin-filter-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .admin-filter-tab {
+    padding: 5px 12px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 600;
+    background: var(--pink-light);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .admin-filter-tab.active {
+    background: linear-gradient(135deg, var(--pink), var(--purple));
+    color: white;
+  }
+
+  /* Password modal */
+  .pwd-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(59,26,40,0.5);
+    z-index: 600;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .pwd-modal.show { display: flex; }
+  .pwd-box {
+    background: white;
+    border-radius: 24px;
+    padding: 32px 24px;
+    text-align: center;
+    width: 100%;
+    max-width: 300px;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.15);
+  }
+  .pwd-emoji { font-size: 48px; display: block; margin-bottom: 12px; }
+  .pwd-title { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .pwd-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; }
+  .pwd-input {
+    width: 100%;
+    height: 48px;
+    border: 2px solid var(--pink-mid);
+    border-radius: 14px;
+    padding: 0 16px;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+    background: var(--pink-light);
+    outline: none;
+    text-align: center;
+    letter-spacing: 4px;
+    font-family: inherit;
+  }
+  .pwd-input:focus { border-color: var(--pink); }
+  .pwd-input.error {
+    border-color: #DC2626;
+    animation: shake 0.4s ease;
+  }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    75% { transform: translateX(8px); }
+  }
+  .pwd-btn {
+    width: 100%;
+    height: 44px;
+    background: linear-gradient(135deg, var(--pink), var(--purple));
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 14px;
+    box-shadow: 0 4px 14px rgba(244,114,182,0.35);
+  }
+  .pwd-cancel {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 13px;
+    cursor: pointer;
+    margin-top: 10px;
+    display: inline-block;
+  }
+
+  .emoji-picker-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 4px;
+    margin-top: 6px;
+  }
+  .emoji-pick {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.1s, background 0.1s;
+  }
+  .emoji-pick:hover { background: var(--pink-light); }
+  .emoji-pick:active { transform: scale(0.88); }
+  .emoji-pick.selected { background: var(--pink-mid); border: 2px solid var(--pink); }
 </style>
 </head>
 <body>
 
-<div class="header">
-  <div class="header-title">
-    <span class="heart-deco">♡</span> 专属点单
-    <span class="heart-deco">♡</span>
+<!-- ===== GIRLFRIEND PAGE ===== -->
+<div id="girlPage">
+  <div class="header">
+    <div class="header-admin-btn" onclick="showPwdModal()" title="管理">⚙</div>
+    <div class="header-title" id="mainTitle">
+      <span class="heart-deco">♡</span> <span id="titleText">专属点单</span>
+      <span class="heart-deco">♡</span>
+    </div>
+    <div class="header-sub" id="mainSub">为你准备的小小惊喜，随时随地</div>
   </div>
-  <div class="header-sub">为你准备的小小惊喜，随时随地</div>
-</div>
 
-<!-- Notification hint -->
-<div class="notify-hint">
-  <div class="notify-hint-icon">🔔</div>
-  <div class="notify-hint-text">
-    <strong>下单即通知 TA</strong>
-    点单提交后，男朋友会立刻收到通知，马上帮你安排～
+  <div class="notify-hint">
+    <div class="notify-hint-icon">🔔</div>
+    <div class="notify-hint-text">
+      <strong>下单即通知 TA</strong>
+      点单提交后，男朋友会立刻收到通知，马上帮你安排～
+    </div>
   </div>
-</div>
 
-<!-- History button -->
-<div class="history-btn" onclick="openHistory()">
-  📋 查看我的点单记录
-</div>
+  <div class="history-btn" onclick="openHistory()">
+    📋 查看我的点单记录
+  </div>
 
-<!-- Category tabs -->
-<div class="cat-tabs" id="catTabs">
-  <div class="cat-tab active" onclick="filterCat('all', this)">全部</div>
-  <div class="cat-tab" onclick="filterCat('drink', this)">☕ 饮品</div>
-  <div class="cat-tab" onclick="filterCat('food', this)">🍱 美食</div>
-  <div class="cat-tab" onclick="filterCat('sweet', this)">🍰 甜品零食</div>
-  <div class="cat-tab" onclick="filterCat('activity', this)">🎡 活动娱乐</div>
-  <div class="cat-tab" onclick="filterCat('care', this)">💆 宠爱放松</div>
-  <div class="cat-tab" onclick="filterCat('gift', this)">🎁 惊喜心意</div>
-</div>
+  <div class="cat-tabs" id="catTabs">
+    <div class="cat-tab active" onclick="filterCat('all', this)">全部</div>
+  </div>
 
-<!-- Items section -->
-<div class="section" id="itemsSection"></div>
+  <div class="section" id="itemsSection"></div>
 
-<div class="page-footer">用心为你做的每一份 ♡ 全部免费</div>
+  <div class="page-footer">用心为你做的每一份 ♡ 全部免费</div>
 
-<!-- Cart button -->
-<div class="cart-btn" onclick="openCart()">
-  <span class="cart-icon">🛒</span>
-  <span class="cart-count" id="cartCount">0</span>
+  <div class="cart-btn" onclick="openCart()">
+    <span class="cart-icon">🛒</span>
+    <span class="cart-count" id="cartCount">0</span>
+  </div>
 </div>
 
 <!-- Cart drawer -->
@@ -654,78 +940,185 @@
   </div>
 </div>
 
+<!-- Password modal -->
+<div class="pwd-modal" id="pwdModal">
+  <div class="pwd-box">
+    <span class="pwd-emoji">🔐</span>
+    <div class="pwd-title">管理后台</div>
+    <div class="pwd-sub">请输入管理密码</div>
+    <input class="pwd-input" id="pwdInput" type="password" maxlength="6" placeholder="······" onkeydown="if(event.key==='Enter')verifyPwd()">
+    <button class="pwd-btn" onclick="verifyPwd()">进入管理</button>
+    <div class="pwd-cancel" onclick="closePwdModal()">取消</div>
+  </div>
+</div>
+
+<!-- ===== ADMIN PAGE ===== -->
+<div class="admin-overlay" id="adminPage">
+  <div class="admin-header">
+    <div class="admin-header-title">⚙ 管理后台</div>
+    <button class="admin-back-btn" onclick="closeAdmin()">返回点单页</button>
+  </div>
+  <div class="admin-body">
+
+    <!-- Title settings -->
+    <div class="admin-section">
+      <div class="admin-section-title">✏️ 页面标题设置</div>
+      <div class="admin-label">主标题</div>
+      <input class="admin-input" id="adminTitle" placeholder="比如：专属点单、宝贝心愿单">
+      <div class="admin-label">副标题</div>
+      <input class="admin-input" id="adminSub" placeholder="比如：为你准备的小小惊喜">
+      <button class="admin-btn admin-btn-primary" onclick="saveTitle()">💾 保存标题</button>
+    </div>
+
+    <!-- Add item -->
+    <div class="admin-section">
+      <div class="admin-section-title">➕ 添加商品</div>
+      <div class="admin-label">分类</div>
+      <select class="admin-select" id="addCat">
+        <option value="drink">☕ 饮品</option>
+        <option value="food">🍱 美食</option>
+        <option value="sweet">🍰 甜品零食</option>
+        <option value="activity">🎡 活动娱乐</option>
+        <option value="care">💆 宠爱放松</option>
+        <option value="gift">🎁 惊喜心意</option>
+      </select>
+      <div class="admin-row">
+        <div>
+          <div class="admin-label">表情</div>
+          <input class="admin-input" id="addEmoji" placeholder="🧋" maxlength="4" onfocus="showEmojiPicker()" style="font-size:20px">
+          <div class="emoji-picker-grid" id="emojiPicker" style="display:none"></div>
+        </div>
+        <div>
+          <div class="admin-label">标签（选填）</div>
+          <input class="admin-input" id="addBadge" placeholder="如：新品、人气">
+        </div>
+      </div>
+      <div class="admin-label">商品名称</div>
+      <input class="admin-input" id="addName" placeholder="比如：珍珠奶茶">
+      <div class="admin-label">商品描述</div>
+      <textarea class="admin-textarea" id="addDesc" rows="2" placeholder="比如：浓香茶底，粒粒Q弹珍珠"></textarea>
+      <button class="admin-btn admin-btn-primary" onclick="addItem()">✨ 添加商品</button>
+    </div>
+
+    <!-- Item list with delete -->
+    <div class="admin-section">
+      <div class="admin-section-title">🗑️ 管理商品（点击删除）</div>
+      <div class="admin-filter-tabs" id="adminFilterTabs"></div>
+      <div id="adminItemList"></div>
+    </div>
+
+  </div>
+</div>
+
 <!-- Float hearts container -->
 <div class="float-hearts" id="floatHearts"></div>
 
 <script>
-const MENU = [
-  // 饮品
+const DEFAULT_MENU = [
   { id:1, cat:'drink', emoji:'🧋', name:'珍珠奶茶', desc:'浓香茶底，粒粒Q弹珍珠，甜度可调', badge:'最爱' },
-  { id:2, cat:'drink', emoji:'🍵', name:'抹茶拿铁', desc:'日式抹茶 + 绵密牛奶，微苦回甘' },
-  { id:3, cat:'drink', emoji:'☕', name:'焦糖玛奇朵', desc:'浓缩咖啡 + 焦糖糖浆，香甜温暖' },
-  { id:4, cat:'drink', emoji:'🍓', name:'草莓思慕雪', desc:'新鲜草莓 + 酸奶打成，清爽满口' },
-  { id:5, cat:'drink', emoji:'🍑', name:'蜜桃乌龙茶', desc:'水蜜桃香气与乌龙茶完美结合' },
+  { id:2, cat:'drink', emoji:'🍵', name:'抹茶拿铁', desc:'日式抹茶 + 绵密牛奶，微苦回甘', badge:'' },
+  { id:3, cat:'drink', emoji:'☕', name:'焦糖玛奇朵', desc:'浓缩咖啡 + 焦糖糖浆，香甜温暖', badge:'' },
+  { id:4, cat:'drink', emoji:'🍓', name:'草莓思慕雪', desc:'新鲜草莓 + 酸奶打成，清爽满口', badge:'' },
+  { id:5, cat:'drink', emoji:'🍑', name:'蜜桃乌龙茶', desc:'水蜜桃香气与乌龙茶完美结合', badge:'' },
   { id:6, cat:'drink', emoji:'🥛', name:'玫瑰豆乳', desc:'玫瑰花香 × 香浓豆乳，美肌之选', badge:'新品' },
-  // 美食
-  { id:7, cat:'food', emoji:'🍜', name:'番茄牛腩面', desc:'慢炖牛腩，酸甜番茄浓汤，暖胃满足' },
-  { id:8, cat:'food', emoji:'🍱', name:'日式便当', desc:'三文鱼饭团 + 玉子烧 + 若干小菜' },
-  { id:9, cat:'food', emoji:'🥗', name:'凯撒沙拉', desc:'罗马生菜 + 培根碎 + 凯撒酱' },
+  { id:7, cat:'food', emoji:'🍜', name:'番茄牛腩面', desc:'慢炖牛腩，酸甜番茄浓汤，暖胃满足', badge:'' },
+  { id:8, cat:'food', emoji:'🍱', name:'日式便当', desc:'三文鱼饭团 + 玉子烧 + 若干小菜', badge:'' },
+  { id:9, cat:'food', emoji:'🥗', name:'凯撒沙拉', desc:'罗马生菜 + 培根碎 + 凯撒酱', badge:'' },
   { id:10, cat:'food', emoji:'🍕', name:'水果披萨', desc:'薄底披萨 + 新鲜草莓芒果，甜咸交织', badge:'人气' },
-  { id:11, cat:'food', emoji:'🥐', name:'牛角可颂', desc:'法式黄油酥皮，夹火腿奶酪或果酱' },
-  { id:12, cat:'food', emoji:'🍣', name:'精选寿司拼盘', desc:'三文鱼 / 金枪鱼 / 虾仁，共12贯' },
-  // 甜品零食
+  { id:11, cat:'food', emoji:'🥐', name:'牛角可颂', desc:'法式黄油酥皮，夹火腿奶酪或果酱', badge:'' },
+  { id:12, cat:'food', emoji:'🍣', name:'精选寿司拼盘', desc:'三文鱼 / 金枪鱼 / 虾仁，共12贯', badge:'' },
   { id:13, cat:'sweet', emoji:'🍰', name:'草莓千层蛋糕', desc:'20层薄饼 × 鲜奶油 × 草莓，少女心满满', badge:'招牌' },
-  { id:14, cat:'sweet', emoji:'🧇', name:'格子松饼', desc:'配枫糖浆 + 水果 + 冰淇淋球，幸福味道' },
-  { id:15, cat:'sweet', emoji:'🍦', name:'双球冰淇淋', desc:'草莓 / 抹茶 / 香草，自选口味' },
-  { id:16, cat:'sweet', emoji:'🍫', name:'黑巧克力礼盒', desc:'比利时黑巧 × 6粒，附手写祝福卡' },
-  { id:17, cat:'sweet', emoji:'🍡', name:'草莓大福', desc:'糯米皮包红豆沙和草莓，日式和果子' },
-  { id:18, cat:'sweet', emoji:'🧁', name:'裱花纸杯蛋糕', desc:'玫瑰 / 爱心造型，好看又好吃' },
-  // 活动娱乐
+  { id:14, cat:'sweet', emoji:'🧇', name:'格子松饼', desc:'配枫糖浆 + 水果 + 冰淇淋球，幸福味道', badge:'' },
+  { id:15, cat:'sweet', emoji:'🍦', name:'双球冰淇淋', desc:'草莓 / 抹茶 / 香草，自选口味', badge:'' },
+  { id:16, cat:'sweet', emoji:'🍫', name:'黑巧克力礼盒', desc:'比利时黑巧 × 6粒，附手写祝福卡', badge:'' },
+  { id:17, cat:'sweet', emoji:'🍡', name:'草莓大福', desc:'糯米皮包红豆沙和草莓，日式和果子', badge:'' },
+  { id:18, cat:'sweet', emoji:'🧁', name:'裱花纸杯蛋糕', desc:'玫瑰 / 爱心造型，好看又好吃', badge:'' },
   { id:19, cat:'activity', emoji:'🎬', name:'电影之夜', desc:'挑一部你想看的，爆米花 + 抱枕全备好', badge:'限定' },
-  { id:20, cat:'activity', emoji:'🎮', name:'游戏对战', desc:'Switch / 手游，玩你喜欢的，输了请你吃糖' },
-  { id:21, cat:'activity', emoji:'🛍️', name:'陪逛街购物', desc:'全程拎包 + 只说好看 + 结账全包，随时出发' },
-  { id:22, cat:'activity', emoji:'🌅', name:'看日落', desc:'找个好地方一起看日落，带好喝的' },
-  { id:23, cat:'activity', emoji:'📸', name:'写真拍摄', desc:'帮你拍100张，精修10张，记录美好' },
+  { id:20, cat:'activity', emoji:'🎮', name:'游戏对战', desc:'Switch / 手游，玩你喜欢的，输了请你吃糖', badge:'' },
+  { id:21, cat:'activity', emoji:'🛍️', name:'陪逛街购物', desc:'全程拎包 + 只说好看 + 结账全包，随时出发', badge:'' },
+  { id:22, cat:'activity', emoji:'🌅', name:'看日落', desc:'找个好地方一起看日落，带好喝的', badge:'' },
+  { id:23, cat:'activity', emoji:'📸', name:'写真拍摄', desc:'帮你拍100张，精修10张，记录美好', badge:'' },
   { id:24, cat:'activity', emoji:'🎡', name:'游乐园一日游', desc:'坐旋转木马 + 吃棉花糖 + 所有费用全包', badge:'惊喜' },
-  { id:25, cat:'activity', emoji:'🍳', name:'学一道菜', desc:'一起去菜市场，他教你做一道拿手菜' },
-  { id:26, cat:'activity', emoji:'🎨', name:'手工DIY', desc:'陶艺 / 绘画 / 扎染，选你喜欢的工坊' },
-  // 宠爱放松
+  { id:25, cat:'activity', emoji:'🍳', name:'学一道菜', desc:'一起去菜市场，他教你做一道拿手菜', badge:'' },
+  { id:26, cat:'activity', emoji:'🎨', name:'手工DIY', desc:'陶艺 / 绘画 / 扎染，选你喜欢的工坊', badge:'' },
   { id:27, cat:'care', emoji:'💆', name:'手部护理', desc:'精油按摩 + 补水护理，软嫩如初', badge:'宠爱' },
-  { id:28, cat:'care', emoji:'🛁', name:'泡澡套餐', desc:'准备好浴盐 + 蜡烛 + 你爱听的歌单' },
-  { id:29, cat:'care', emoji:'💅', name:'美甲陪伴', desc:'陪你去做美甲，等候全程在旁边' },
-  { id:30, cat:'care', emoji:'😴', name:'懒觉特权', desc:'周末睡到自然醒，早饭送到床边' },
+  { id:28, cat:'care', emoji:'🛁', name:'泡澡套餐', desc:'准备好浴盐 + 蜡烛 + 你爱听的歌单', badge:'' },
+  { id:29, cat:'care', emoji:'💅', name:'美甲陪伴', desc:'陪你去做美甲，等候全程在旁边', badge:'' },
+  { id:30, cat:'care', emoji:'😴', name:'懒觉特权', desc:'周末睡到自然醒，早饭送到床边', badge:'' },
   { id:31, cat:'care', emoji:'🤗', name:'抱抱券', desc:'随时兑换，不限时长，不需要理由', badge:'无限' },
-  { id:32, cat:'care', emoji:'🌡️', name:'生病照料', desc:'熬粥 + 买药 + 陪伴，全程守护' },
-  // 惊喜心意
+  { id:32, cat:'care', emoji:'🌡️', name:'生病照料', desc:'熬粥 + 买药 + 陪伴，全程守护', badge:'' },
   { id:33, cat:'gift', emoji:'💐', name:'鲜花一束', desc:'你喜欢的花，亲手送到你面前', badge:'浪漫' },
-  { id:34, cat:'gift', emoji:'📝', name:'手写情书', desc:'认真写满一页，只写给你看的' },
-  { id:35, cat:'gift', emoji:'🌟', name:'星空命名', desc:'以你的名字命名一颗星，附证书' },
-  { id:36, cat:'gift', emoji:'🎶', name:'专属歌单', desc:'精心挑选50首，每首都在说我爱你' },
-  { id:37, cat:'gift', emoji:'🍱', name:'爱心便当', desc:'亲手做的便当，里面有颗心形蛋包饭' },
-  { id:38, cat:'gift', emoji:'📷', name:'回忆相册', desc:'整理你们在一起的照片，做成精美相册' },
+  { id:34, cat:'gift', emoji:'📝', name:'手写情书', desc:'认真写满一页，只写给你看的', badge:'' },
+  { id:35, cat:'gift', emoji:'🌟', name:'星空命名', desc:'以你的名字命名一颗星，附证书', badge:'' },
+  { id:36, cat:'gift', emoji:'🎶', name:'专属歌单', desc:'精心挑选50首，每首都在说我爱你', badge:'' },
+  { id:37, cat:'gift', emoji:'🍱', name:'爱心便当', desc:'亲手做的便当，里面有颗心形蛋包饭', badge:'' },
+  { id:38, cat:'gift', emoji:'📷', name:'回忆相册', desc:'整理你们在一起的照片，做成精美相册', badge:'' },
 ];
 
+const ADMIN_PWD = '286888';
+const CAT_LABELS = { drink:'☕ 饮品', food:'🍱 美食', sweet:'🍰 甜品零食', activity:'🎡 活动娱乐', care:'💆 宠爱放松', gift:'🎁 惊喜心意' };
+const EMOJIS = ['🧋','🍵','☕','🍓','🍑','🥛','🧃','🍷','🥤','🍋','🍜','🍱','🥗','🍕','🥐','🍣','🍔','🥘','🍰','🧇','🍦','🍫','🍡','🧁','🍪','🥧','🎂','🎬','🎮','🛍️','🌅','📸','🎡','🍳','🎨','⛺','🎪','💆','🛁','💅','😴','🤗','🌡️','🧸','💐','📝','🌟','🎶','🍱','📷','🎁','💝','🎈','🎀','💍','🧧','💌','🪄'];
+
+// Load menu from localStorage or use default
+let MENU = JSON.parse(localStorage.getItem('sweetMenu') || 'null') || [...DEFAULT_MENU];
 let cart = {};
 let orders = JSON.parse(localStorage.getItem('sweetOrders') || '[]');
 let currentCat = 'all';
+let adminCat = 'all';
+
+// Load title settings
+function loadTitle() {
+  const settings = JSON.parse(localStorage.getItem('sweetSettings') || '{}');
+  if (settings.title) document.getElementById('titleText').textContent = settings.title;
+  if (settings.sub) document.getElementById('mainSub').textContent = settings.sub;
+  document.title = (settings.title || '专属点单') + ' ♡ 为你准备';
+}
+
+function saveTitle() {
+  const title = document.getElementById('adminTitle').value.trim();
+  const sub = document.getElementById('adminSub').value.trim();
+  const settings = JSON.parse(localStorage.getItem('sweetSettings') || '{}');
+  if (title) settings.title = title;
+  if (sub) settings.sub = sub;
+  localStorage.setItem('sweetSettings', JSON.stringify(settings));
+  loadTitle();
+  alert('标题已保存！');
+}
+
+function saveMenu() {
+  localStorage.setItem('sweetMenu', JSON.stringify(MENU));
+}
+
+// ===== Category tabs =====
+function renderCatTabs() {
+  const cats = [...new Set(MENU.map(i => i.cat))];
+  const tabs = document.getElementById('catTabs');
+  let html = '<div class="cat-tab active" onclick="filterCat(\'all\', this)">全部</div>';
+  cats.forEach(cat => {
+    if (CAT_LABELS[cat]) {
+      html += `<div class="cat-tab" onclick="filterCat('${cat}', this)">${CAT_LABELS[cat]}</div>`;
+    }
+  });
+  tabs.innerHTML = html;
+  currentCat = 'all';
+}
 
 function filterCat(cat, el) {
   currentCat = cat;
-  document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('#catTabs .cat-tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
   renderItems();
 }
 
 function renderItems() {
   const items = currentCat === 'all' ? MENU : MENU.filter(i => i.cat === currentCat);
-  const catLabels = { drink:'☕ 饮品', food:'🍱 美食', sweet:'🍰 甜品零食', activity:'🎡 活动娱乐', care:'💆 宠爱放松', gift:'🎁 惊喜心意' };
-  
   let html = '';
   if (currentCat === 'all') {
-    const cats = ['drink','food','sweet','activity','care','gift'];
+    const cats = [...new Set(MENU.map(i => i.cat))];
     cats.forEach(cat => {
+      if (!CAT_LABELS[cat]) return;
       const catItems = MENU.filter(i => i.cat === cat);
-      html += `<div class="section-title"><span>${catLabels[cat].split(' ')[0]}</span>${catLabels[cat].split(' ').slice(1).join(' ')}</div>`;
+      html += `<div class="section-title"><span>${CAT_LABELS[cat].split(' ')[0]}</span>${CAT_LABELS[cat].split(' ').slice(1).join(' ')}</div>`;
       html += '<div class="items-grid">';
       catItems.forEach(item => { html += renderItemCard(item); });
       html += '</div>';
@@ -765,17 +1158,16 @@ function renderItemCard(item) {
 function changeQty(id, delta, e) {
   e && e.stopPropagation();
   const item = MENU.find(i => i.id === id);
+  if (!item) return;
   cart[id] = Math.max(0, (cart[id] || 0) + delta);
   if (cart[id] === 0) delete cart[id];
   updateCartBadge();
-  // Re-render just this card
   const card = document.getElementById('card-' + id);
   if (card) {
     const tmp = document.createElement('div');
     tmp.innerHTML = renderItemCard(item);
     card.replaceWith(tmp.firstElementChild);
   }
-  // Spawn hearts when adding
   if (delta > 0 && e) spawnHearts(e.clientX, e.clientY);
 }
 
@@ -855,7 +1247,6 @@ function changeQtyFromCart(id, delta) {
   if (cart[id] === 0) delete cart[id];
   updateCartBadge();
   renderCartItems();
-  // Update card in background
   const item = MENU.find(i => i.id == id);
   const card = document.getElementById('card-' + id);
   if (card && item) {
@@ -880,24 +1271,17 @@ function submitOrder() {
   orders.unshift(order);
   if (orders.length > 30) orders = orders.slice(0,30);
   localStorage.setItem('sweetOrders', JSON.stringify(orders));
-
-  // Trigger notification (browser notification API)
   sendNotification(order);
-
-  // Reset
   cart = {};
   updateCartBadge();
   renderItems();
   closeCart();
   document.getElementById('orderNote').value = '';
-
-  // Show success
   document.getElementById('successOrderId').textContent = '订单号：' + orderId;
   document.getElementById('successModal').classList.add('show');
 }
 
 function sendNotification(order) {
-  // Try to show browser notification (requires permission)
   if ('Notification' in window) {
     const doNotify = () => {
       new Notification('💌 新心愿单！', {
@@ -906,11 +1290,8 @@ function sendNotification(order) {
         tag: order.id
       });
     };
-    if (Notification.permission === 'granted') {
-      doNotify();
-    } else if (Notification.permission !== 'denied') {
-      Notification.requestPermission().then(p => { if (p === 'granted') doNotify(); });
-    }
+    if (Notification.permission === 'granted') doNotify();
+    else if (Notification.permission !== 'denied') Notification.requestPermission().then(p => { if (p === 'granted') doNotify(); });
   }
 }
 
@@ -956,13 +1337,165 @@ function renderHistory() {
   document.getElementById('historyList').innerHTML = html;
 }
 
-// Request notification permission on load
+// ===== Admin functions =====
+function showPwdModal() {
+  document.getElementById('pwdModal').classList.add('show');
+  document.getElementById('pwdInput').value = '';
+  document.getElementById('pwdInput').classList.remove('error');
+  setTimeout(() => document.getElementById('pwdInput').focus(), 100);
+}
+
+function closePwdModal() {
+  document.getElementById('pwdModal').classList.remove('show');
+}
+
+function verifyPwd() {
+  const input = document.getElementById('pwdInput');
+  if (input.value === ADMIN_PWD) {
+    closePwdModal();
+    openAdmin();
+  } else {
+    input.classList.add('error');
+    setTimeout(() => input.classList.remove('error'), 500);
+    input.value = '';
+  }
+}
+
+function openAdmin() {
+  // Load current settings
+  const settings = JSON.parse(localStorage.getItem('sweetSettings') || '{}');
+  document.getElementById('adminTitle').value = settings.title || '';
+  document.getElementById('adminSub').value = settings.sub || '';
+  adminCat = 'all';
+  renderAdminFilters();
+  renderAdminItems();
+  document.getElementById('adminPage').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeAdmin() {
+  document.getElementById('adminPage').classList.remove('show');
+  document.body.style.overflow = '';
+  // Refresh girlfriend page
+  renderCatTabs();
+  renderItems();
+  loadTitle();
+}
+
+function addItem() {
+  const cat = document.getElementById('addCat').value;
+  const emoji = document.getElementById('addEmoji').value.trim() || '🎁';
+  const name = document.getElementById('addName').value.trim();
+  const desc = document.getElementById('addDesc').value.trim();
+  const badge = document.getElementById('addBadge').value.trim();
+
+  if (!name) {
+    alert('请输入商品名称');
+    return;
+  }
+
+  const maxId = MENU.length > 0 ? Math.max(...MENU.map(i => i.id)) : 0;
+  MENU.push({ id: maxId + 1, cat, emoji, name, desc: desc || '用心准备的惊喜', badge: badge || '' });
+  saveMenu();
+
+  // Clear form
+  document.getElementById('addEmoji').value = '';
+  document.getElementById('addName').value = '';
+  document.getElementById('addDesc').value = '';
+  document.getElementById('addBadge').value = '';
+
+  renderAdminItems();
+  alert('添加成功！');
+}
+
+function deleteItem(id) {
+  const item = MENU.find(i => i.id === id);
+  if (!item) return;
+  if (confirm(`确定删除「${item.name}」吗？`)) {
+    MENU = MENU.filter(i => i.id !== id);
+    delete cart[id];
+    saveMenu();
+    updateCartBadge();
+    renderAdminItems();
+  }
+}
+
+function renderAdminFilters() {
+  const tabs = document.getElementById('adminFilterTabs');
+  let html = '<div class="admin-filter-tab active" onclick="filterAdmin(\'all\', this)">全部</div>';
+  Object.keys(CAT_LABELS).forEach(cat => {
+    html += `<div class="admin-filter-tab" onclick="filterAdmin('${cat}', this)">${CAT_LABELS[cat]}</div>`;
+  });
+  tabs.innerHTML = html;
+  adminCat = 'all';
+}
+
+function filterAdmin(cat, el) {
+  adminCat = cat;
+  document.querySelectorAll('#adminFilterTabs .admin-filter-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderAdminItems();
+}
+
+function renderAdminItems() {
+  const items = adminCat === 'all' ? MENU : MENU.filter(i => i.cat === adminCat);
+  const container = document.getElementById('adminItemList');
+  if (items.length === 0) {
+    container.innerHTML = '<div class="admin-empty">暂无商品，点击上方添加</div>';
+    return;
+  }
+  let html = '';
+  items.forEach(item => {
+    html += `
+      <div class="admin-item-row">
+        <span class="admin-item-emoji">${item.emoji}</span>
+        <div class="admin-item-info">
+          <div class="admin-item-name">${item.badge ? '[' + item.badge + '] ' : ''}${item.name}</div>
+          <div class="admin-item-cat">${CAT_LABELS[item.cat] || item.cat} · ${item.desc.substring(0,25)}</div>
+        </div>
+        <div class="admin-item-del" onclick="deleteItem(${item.id})">✕</div>
+      </div>`;
+  });
+  container.innerHTML = html;
+}
+
+// Emoji picker
+function showEmojiPicker() {
+  const picker = document.getElementById('emojiPicker');
+  if (picker.style.display === 'grid') {
+    picker.style.display = 'none';
+    return;
+  }
+  let html = '';
+  EMOJIS.forEach(e => {
+    html += `<div class="emoji-pick" onclick="pickEmoji('${e}')">${e}</div>`;
+  });
+  picker.innerHTML = html;
+  picker.style.display = 'grid';
+}
+
+function pickEmoji(emoji) {
+  document.getElementById('addEmoji').value = emoji;
+  document.getElementById('emojiPicker').style.display = 'none';
+}
+
+// Reset to defaults
+function resetMenu() {
+  if (confirm('确定恢复默认商品列表吗？你添加的自定义商品将丢失。')) {
+    MENU = [...DEFAULT_MENU];
+    saveMenu();
+    renderAdminItems();
+    alert('已恢复默认！');
+  }
+}
+
+// Init
 window.addEventListener('load', () => {
+  loadTitle();
+  renderCatTabs();
   renderItems();
   if ('Notification' in window && Notification.permission === 'default') {
-    setTimeout(() => {
-      Notification.requestPermission();
-    }, 3000);
+    setTimeout(() => Notification.requestPermission(), 3000);
   }
 });
 </script>

@@ -1548,7 +1548,7 @@ function deployToGithub() {
       if (!data.sha) throw new Error('获取文件失败：' + (data.message || '未知错误'));
 
       // Step 2: Modify the HTML content - update NOTIFICATION_CONFIG in the code
-      let html = atob(data.content.replace(/\n/g, ''));
+      let html = decodeURIComponent(escape(atob(data.content.replace(/\n/g, ''))));
       
       // Replace the config values
       html = html.replace(
@@ -1557,7 +1557,7 @@ function deployToGithub() {
       );
       html = html.replace(
         /barkKey:\s*'[^']*'/,
-        "barkKey: ''') + "'"
+        "barkKey: '" + (NOTIFICATION_CONFIG.barkKey || '') + "'"
       );
 
       // Step 3: Push updated file

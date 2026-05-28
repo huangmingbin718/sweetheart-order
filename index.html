@@ -960,6 +960,31 @@
   </div>
   <div class="admin-body">
 
+    <!-- Notification settings -->
+    <div class="admin-section">
+      <div class="admin-section-title">🔔 微信通知设置</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;line-height:1.6">
+        她点单后，你的微信立刻收到消息提醒！<br>
+        👉 <a href="https://sct.ftqq.com" target="_blank" style="color:var(--pink);font-weight:600">点此用微信扫码登录Server酱</a>，复制 SendKey 粘贴到下面
+      </div>
+      <div class="admin-label">Server酱 SendKey</div>
+      <input class="admin-input" id="adminSendKey" placeholder="SCT开头的字符串，如 SCTxxx..." autocomplete="off">
+      <div style="font-size:11px;color:var(--text-muted);margin-top:4px">
+        💡 登录 sct.ftqq.com → 「Key & API」→ 复制 SendKey
+      </div>
+      <button class="admin-btn admin-btn-primary" onclick="saveSendKey()">💾 保存通知设置</button>
+      <button class="admin-btn admin-btn-secondary" onclick="testSendKey()">🔔 发送测试通知</button>
+
+      <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--pink-light)">
+        <div class="admin-label" style="margin-top:0">🍎 iOS 用户备选：Bark 推送</div>
+        <input class="admin-input" id="adminBarkKey" placeholder="Bark Key（选填）" autocomplete="off">
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px">
+          如果你有 iPhone 且装了 Bark App，可填入 Bark Key 作为备选通知方式
+        </div>
+        <button class="admin-btn admin-btn-secondary" onclick="saveBarkKey()">保存 Bark 设置</button>
+      </div>
+    </div>
+
     <!-- Title settings -->
     <div class="admin-section">
       <div class="admin-section-title">✏️ 页面标题设置</div>
@@ -1282,6 +1307,7 @@ function submitOrder() {
 }
 
 function sendNotification(order) {
+  // 1. 浏览器本地通知（保留）
   if ('Notification' in window) {
     const doNotify = () => {
       new Notification('💌 新心愿单！', {
@@ -1292,6 +1318,49 @@ function sendNotification(order) {
     };
     if (Notification.permission === 'granted') doNotify();
     else if (Notification.permission !== 'denied') Notification.requestPermission().then(p => { if (p === 'granted') doNotify(); });
+  }
+
+  // 2. Server酱微信推送
+  const sendKey = localStorage.getItem('sweetSendKey');
+  if (sendKey) {
+    const title = '💌 新心愿单来啦！';
+    const itemsText = order.items.join('\n');
+    const noteText = order.note ? '\n\n💬 留言：' + order.note : '';
+    const timeText = '\n🕐 时间：' + order.time;
+    const desp = '## 🛒 她点了这些\n\n' + itemsText + noteText + timeText + '\n\n---\n*来自专属点单小程序 ♡*';
+
+    // 使用 fetch 发送，兼容微信内置浏览器
+    const url = 'https://sctapi.ftqq.com/' + sendKey + '.send';
+    const params = new URLSearchParams();
+    params.append('title', title);
+    params.append('desp', desp);
+
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: params.toString()
+    }).then(r => r.json()).then(data => {
+      console.log('Server酱推送结果:', data);
+    }).catch(err => {
+      console.error('Server酱推送失败:', err);
+      // 如果 Server酱 失败，尝试备用的 Bark 推送
+      const barkKey = localStorage.getItem('sweetBarkKey');
+      if (barkKey) {
+        const barkUrl = 'https://api.day.app/' + barkKey + '/' + encodeURIComponent(title + ' ' + order.items.join(',')) + '?icon=https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/svg/1f48c.svg';
+        fetch(barkUrl).catch(() => {});
+      }
+    });
+  }
+
+  // 3. Bark推送（iOS备选，如果配了Server酱就不需要）
+  if (!sendKey) {
+    const barkKey = localStorage.getItem('sweetBarkKey');
+    if (barkKey) {
+      const barkTitle = '💌 新心愿单！';
+      const barkBody = order.items.join(',') + (order.note ? ' | ' + order.note : '');
+      const barkUrl = 'https://api.day.app/' + barkKey + '/' + encodeURIComponent(barkTitle + '/' + barkBody) + '?icon=https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/svg/1f48c.svg&group=sweetorder';
+      fetch(barkUrl).catch(() => {});
+    }
   }
 }
 
@@ -1366,11 +1435,66 @@ function openAdmin() {
   const settings = JSON.parse(localStorage.getItem('sweetSettings') || '{}');
   document.getElementById('adminTitle').value = settings.title || '';
   document.getElementById('adminSub').value = settings.sub || '';
+  // Load notification settings
+  const savedKey = localStorage.getItem('sweetSendKey') || '';
+  document.getElementById('adminSendKey').value = savedKey;
+  const savedBarkKey = localStorage.getItem('sweetBarkKey') || '';
+  document.getElementById('adminBarkKey').value = savedBarkKey;
   adminCat = 'all';
   renderAdminFilters();
   renderAdminItems();
   document.getElementById('adminPage').classList.add('show');
   document.body.style.overflow = 'hidden';
+}
+
+function saveSendKey() {
+  const key = document.getElementById('adminSendKey').value.trim();
+  if (key) {
+    localStorage.setItem('sweetSendKey', key);
+    alert('Server酱 SendKey 已保存！✅\n她下次点单你就能在微信收到通知了。');
+  } else {
+    localStorage.removeItem('sweetSendKey');
+    alert('已清除 Server酱 设置。');
+  }
+}
+
+function saveBarkKey() {
+  const key = document.getElementById('adminBarkKey').value.trim();
+  if (key) {
+    localStorage.setItem('sweetBarkKey', key);
+    alert('Bark Key 已保存！✅');
+  } else {
+    localStorage.removeItem('sweetBarkKey');
+    alert('已清除 Bark 设置。');
+  }
+}
+
+function testSendKey() {
+  const key = document.getElementById('adminSendKey').value.trim();
+  if (!key) {
+    alert('请先输入 Server酱 SendKey');
+    return;
+  }
+  localStorage.setItem('sweetSendKey', key);
+
+  const url = 'https://sctapi.ftqq.com/' + key + '.send';
+  const params = new URLSearchParams();
+  params.append('title', '🔔 通知测试成功！');
+  params.append('desp', '## 恭喜！\n\n你的专属点单小程序已经成功连接微信通知！\n\n以后她每次点单，你都会在微信收到提醒 ♡\n\n---\n*这是一条测试消息*');
+
+  fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: params.toString()
+  }).then(r => r.json()).then(data => {
+    if (data.code === 0) {
+      alert('测试通知已发送！✅\n请查看你的微信是否收到了消息。\n\n（微信消息可能有1-2分钟延迟）');
+    } else {
+      alert('发送失败 😥\n错误信息：' + (data.message || '未知错误') + '\n\n请检查 SendKey 是否正确。');
+    }
+  }).catch(err => {
+    alert('网络请求失败 😥\n请检查网络连接和 SendKey 是否正确。');
+  });
 }
 
 function closeAdmin() {

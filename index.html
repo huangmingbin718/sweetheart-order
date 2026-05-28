@@ -982,6 +982,7 @@
           如果你有 iPhone 且装了 Bark App，可填入 Bark Key 作为备选通知方式
         </div>
         <button class="admin-btn admin-btn-secondary" onclick="saveBarkKey()">保存 Bark 设置</button>
+        <button class="admin-btn admin-btn-secondary" onclick="testBarkKey()">🔔 测试 Bark 通知</button>
       </div>
     </div>
 
@@ -1329,7 +1330,6 @@ function sendNotification(order) {
     const timeText = '\n🕐 时间：' + order.time;
     const desp = '## 🛒 她点了这些\n\n' + itemsText + noteText + timeText + '\n\n---\n*来自专属点单小程序 ♡*';
 
-    // 使用 fetch 发送，兼容微信内置浏览器
     const url = 'https://sctapi.ftqq.com/' + sendKey + '.send';
     const params = new URLSearchParams();
     params.append('title', title);
@@ -1343,24 +1343,20 @@ function sendNotification(order) {
       console.log('Server酱推送结果:', data);
     }).catch(err => {
       console.error('Server酱推送失败:', err);
-      // 如果 Server酱 失败，尝试备用的 Bark 推送
-      const barkKey = localStorage.getItem('sweetBarkKey');
-      if (barkKey) {
-        const barkUrl = 'https://api.day.app/' + barkKey + '/' + encodeURIComponent(title + ' ' + order.items.join(',')) + '?icon=https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/svg/1f48c.svg';
-        fetch(barkUrl).catch(() => {});
-      }
     });
   }
 
-  // 3. Bark推送（iOS备选，如果配了Server酱就不需要）
-  if (!sendKey) {
-    const barkKey = localStorage.getItem('sweetBarkKey');
-    if (barkKey) {
-      const barkTitle = '💌 新心愿单！';
-      const barkBody = order.items.join(',') + (order.note ? ' | ' + order.note : '');
-      const barkUrl = 'https://api.day.app/' + barkKey + '/' + encodeURIComponent(barkTitle + '/' + barkBody) + '?icon=https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/svg/1f48c.svg&group=sweetorder';
-      fetch(barkUrl).catch(() => {});
-    }
+  // 3. Bark推送（iOS，与Server酱独立，可同时启用）
+  const barkKey = localStorage.getItem('sweetBarkKey');
+  if (barkKey) {
+    const barkTitle = '💌 新心愿单！';
+    const barkBody = order.items.join(' ') + (order.note ? ' | ' + order.note : '');
+    const barkUrl = 'https://api.day.app/' + barkKey + '/' + encodeURIComponent(barkTitle + '/' + barkBody) + '?icon=https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/svg/1f48c.svg&group=sweetorder&sound=bell';
+    fetch(barkUrl).then(r => r.json()).then(data => {
+      console.log('Bark推送结果:', data);
+    }).catch(err => {
+      console.error('Bark推送失败:', err);
+    });
   }
 }
 
@@ -1467,6 +1463,29 @@ function saveBarkKey() {
     localStorage.removeItem('sweetBarkKey');
     alert('已清除 Bark 设置。');
   }
+}
+
+function testBarkKey() {
+  const key = document.getElementById('adminBarkKey').value.trim();
+  if (!key) {
+    alert('请先输入 Bark Key');
+    return;
+  }
+  localStorage.setItem('sweetBarkKey', key);
+
+  const barkTitle = '🔔 Bark通知测试成功！';
+  const barkBody = '你的专属点单小程序已成功连接Bark推送！以后她点单你都会收到通知 ♡';
+  const barkUrl = 'https://api.day.app/' + key + '/' + encodeURIComponent(barkTitle + '/' + barkBody) + '?icon=https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/svg/1f48c.svg&group=sweetorder&sound=bell';
+
+  fetch(barkUrl).then(r => r.json()).then(data => {
+    if (data.code === 200) {
+      alert('测试通知已发送！✅\n请查看你的 iPhone 是否收到了 Bark 通知。');
+    } else {
+      alert('发送失败 😥\n错误信息：' + (data.message || JSON.stringify(data)) + '\n\n请检查 Bark Key 是否正确。');
+    }
+  }).catch(err => {
+    alert('网络请求失败 😥\n请检查网络连接和 Bark Key 是否正确。');
+  });
 }
 
 function testSendKey() {

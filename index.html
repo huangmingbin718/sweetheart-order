@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>专属点单 ♡ 为你准备</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --pink: #F472B6;
+    --pink-light: #FCE7F3;
+    --pink-mid: #FBCFE8;
+    --pink-dark: #BE185D;
+    --purple: #C084FC;
+    --purple-light: #F3E8FF;
+    --coral: #FB7185;
+    --coral-light: #FFF1F2;
+    --mint: #6EE7B7;
+    --mint-light: #ECFDF5;
+    --amber: #FCD34D;
+    --amber-light: #FFFBEB;
+    --sky: #7DD3FC;
+    --sky-light: #F0F9FF;
+    --bg: #FFF5F9;
+    --white: #FFFFFF;
+    --text: #3B1A28;
+    --text-muted: #9D6B84;
+    --radius: 20px;
+    --shadow: 0 4px 20px rgba(244,114,182,0.15);
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, #F9A8D4 0%, #C084FC 100%);
+    padding: 28px 20px 36px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 120px; height: 120px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 50%;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -20px; left: -20px;
+    width: 80px; height: 80px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 50%;
+  }
+  .header-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: white;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 8px rgba(190,24,93,0.2);
+  }
+  .header-sub {
+    font-size: 14px;
+    color: rgba(255,255,255,0.88);
+    margin-top: 6px;
+  }
+  .heart-deco {
+    font-size: 18px;
+    margin: 0 6px;
+    display: inline-block;
+    animation: heartbeat 1.4s ease-in-out infinite;
+  }
+  @keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+  }
+
+  /* Cart badge */
+  .cart-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, var(--pink), var(--purple));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 24px rgba(244,114,182,0.45);
+    cursor: pointer;
+    z-index: 100;
+    transition: transform 0.2s;
+    border: 3px solid white;
+  }
+  .cart-btn:active { transform: scale(0.92); }
+  .cart-icon { font-size: 24px; }
+  .cart-count {
+    position: absolute;
+    top: -4px; right: -4px;
+    background: var(--coral);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    border: 2px solid white;
+    display: none;
+  }
+
+  /* Category tabs */
+  .cat-tabs {
+    display: flex;
+    gap: 10px;
+    padding: 16px 16px 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .cat-tabs::-webkit-scrollbar { display: none; }
+  .cat-tab {
+    flex-shrink: 0;
+    padding: 8px 18px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 600;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.22s;
+    white-space: nowrap;
+    background: white;
+    color: var(--text-muted);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .cat-tab.active {
+    background: linear-gradient(135deg, var(--pink), var(--purple));
+    color: white;
+    box-shadow: 0 4px 14px rgba(244,114,182,0.35);
+  }
+
+  /* Section */
+  .section { padding: 0 16px 12px; }
+  .section-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 16px 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .section-title span { font-size: 18px; }
+
+  /* Grid */
+  .items-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  /* Item card */
+  .item-card {
+    background: white;
+    border-radius: 18px;
+    padding: 16px 14px;
+    box-shadow: 0 3px 16px rgba(244,114,182,0.1);
+    position: relative;
+    transition: transform 0.18s, box-shadow 0.18s;
+    cursor: pointer;
+    border: 1.5px solid rgba(244,114,182,0.1);
+  }
+  .item-card:active { transform: scale(0.97); }
+  .item-emoji {
+    font-size: 36px;
+    display: block;
+    margin-bottom: 10px;
+    line-height: 1;
+  }
+  .item-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+    line-height: 1.3;
+  }
+  .item-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-bottom: 10px;
+    min-height: 32px;
+  }
+  .item-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .item-free {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--pink);
+  }
+  .item-add-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--pink), var(--purple));
+    color: white;
+    font-size: 18px;
+    font-weight: 300;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(244,114,182,0.35);
+    transition: transform 0.15s;
+    line-height: 1;
+  }
+  .item-add-btn:active { transform: scale(0.88); }
+  .item-qty {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .item-qty-num {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--pink-dark);
+    min-width: 14px;
+    text-align: center;
+  }
+  .item-minus-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--pink-light);
+    color: var(--pink-dark);
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.15s;
+    line-height: 1;
+    font-weight: 500;
+  }
+  .item-add-sm {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--pink), var(--purple));
+    color: white;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.15s;
+    line-height: 1;
+  }
+  .item-selected {
+    border: 2px solid var(--pink);
+    box-shadow: 0 4px 18px rgba(244,114,182,0.22);
+  }
+  .item-badge {
+    position: absolute;
+    top: 10px; right: 10px;
+    background: linear-gradient(135deg, #FCD34D, #FB923C);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+
+  /* Cart drawer */
+  .cart-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(59,26,40,0.35);
+    z-index: 200;
+    display: none;
+    backdrop-filter: blur(2px);
+  }
+  .cart-overlay.show { display: block; }
+  .cart-drawer {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: white;
+    border-radius: 24px 24px 0 0;
+    padding: 0 0 24px;
+    z-index: 201;
+    transform: translateY(100%);
+    transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    max-height: 82vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .cart-drawer.show { transform: translateY(0); }
+  .cart-header {
+    padding: 20px 20px 12px;
+    border-bottom: 1px solid var(--pink-light);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .cart-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .cart-close {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: var(--pink-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: var(--pink-dark);
+    cursor: pointer;
+  }
+  .cart-items { overflow-y: auto; flex: 1; padding: 12px 20px; }
+  .cart-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--pink-light);
+  }
+  .cart-item:last-child { border-bottom: none; }
+  .cart-item-emoji { font-size: 28px; }
+  .cart-item-info { flex: 1; }
+  .cart-item-name { font-size: 14px; font-weight: 600; color: var(--text); }
+  .cart-item-sub { font-size: 12px; color: var(--text-muted); }
+  .cart-empty {
+    text-align: center;
+    padding: 32px;
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+  .cart-empty-emoji { font-size: 42px; display: block; margin-bottom: 10px; }
+
+  /* Note */
+  .note-section {
+    padding: 16px 20px;
+    border-top: 1px solid var(--pink-light);
+    flex-shrink: 0;
+  }
+  .note-label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+  .note-input {
+    width: 100%;
+    border: 1.5px solid var(--pink-mid);
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--text);
+    background: var(--pink-light);
+    outline: none;
+    resize: none;
+    font-family: inherit;
+    line-height: 1.5;
+  }
+  .note-input:focus { border-color: var(--pink); }
+  .note-input::placeholder { color: var(--text-muted); }
+
+  /* Submit */
+  .submit-section {
+    padding: 12px 20px 0;
+    flex-shrink: 0;
+  }
+  .submit-btn {
+    width: 100%;
+    height: 52px;
+    background: linear-gradient(135deg, var(--pink), var(--purple));
+    color: white;
+    border: none;
+    border-radius: 16px;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(244,114,182,0.4);
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  .submit-btn:active { opacity: 0.9; transform: scale(0.98); }
+  .submit-btn:disabled { opacity: 0.5; }
+
+  /* Success modal */
+  .success-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(59,26,40,0.45);
+    z-index: 300;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .success-modal.show { display: flex; }
+  .success-box {
+    background: white;
+    border-radius: 28px;
+    padding: 36px 28px;
+    text-align: center;
+    width: 100%;
+    max-width: 320px;
+    box-shadow: 0 16px 48px rgba(244,114,182,0.25);
+  }
+  .success-emoji { font-size: 60px; display: block; margin-bottom: 16px; animation: bounce 0.6s ease; }
+  @keyframes bounce {
+    0% { transform: scale(0.4); opacity: 0; }
+    60% { transform: scale(1.15); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .success-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--pink-dark);
+    margin-bottom: 8px;
+  }
+  .success-msg { font-size: 14px; color: var(--text-muted); line-height: 1.7; }
+  .success-close {
+    margin-top: 24px;
+    padding: 12px 40px;
+    background: linear-gradient(135deg, var(--pink), var(--purple));
+    color: white;
+    border: none;
+    border-radius: 30px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(244,114,182,0.35);
+  }
+  .success-order-id {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 10px;
+  }
+
+  /* Notification hint */
+  .notify-hint {
+    margin: 12px 16px;
+    background: linear-gradient(135deg, var(--purple-light), var(--pink-light));
+    border-radius: 14px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    border: 1px solid rgba(192,132,252,0.25);
+  }
+  .notify-hint-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+  .notify-hint-text { font-size: 12px; color: #6B21A8; line-height: 1.6; }
+  .notify-hint-text strong { font-weight: 600; display: block; margin-bottom: 2px; }
+
+  /* Order history pill */
+  .history-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin: 8px 16px 4px;
+    padding: 10px;
+    background: white;
+    border-radius: 14px;
+    border: 1.5px dashed rgba(244,114,182,0.4);
+    font-size: 13px;
+    color: var(--pink-dark);
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* History modal */
+  .history-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(59,26,40,0.4);
+    z-index: 300;
+    display: none;
+    align-items: flex-end;
+  }
+  .history-modal.show { display: flex; }
+  .history-drawer {
+    background: white;
+    border-radius: 24px 24px 0 0;
+    width: 100%;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 24px;
+  }
+  .history-header {
+    padding: 20px 20px 14px;
+    border-bottom: 1px solid var(--pink-light);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .history-title { font-size: 17px; font-weight: 700; }
+  .history-list { overflow-y: auto; flex: 1; padding: 12px 20px; }
+  .history-record {
+    background: var(--bg);
+    border-radius: 14px;
+    padding: 14px;
+    margin-bottom: 10px;
+  }
+  .history-record-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  .history-record-id { font-size: 12px; color: var(--text-muted); }
+  .history-record-time { font-size: 11px; color: var(--text-muted); }
+  .history-record-items { font-size: 13px; color: var(--text); line-height: 1.6; }
+  .history-record-note { font-size: 12px; color: var(--text-muted); margin-top: 4px; font-style: italic; }
+  .status-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    background: var(--mint-light);
+    color: #065F46;
+  }
+  .float-hearts {
+    position: fixed;
+    pointer-events: none;
+    z-index: 999;
+  }
+  .float-heart {
+    position: absolute;
+    font-size: 20px;
+    animation: floatUp 1.2s ease-out forwards;
+  }
+  @keyframes floatUp {
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    100% { transform: translateY(-120px) scale(0.5); opacity: 0; }
+  }
+
+  .page-footer {
+    text-align: center;
+    padding: 16px;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 80px;
+  }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-title">
+    <span class="heart-deco">♡</span> 专属点单
+    <span class="heart-deco">♡</span>
+  </div>
+  <div class="header-sub">为你准备的小小惊喜，随时随地</div>
+</div>
+
+<!-- Notification hint -->
+<div class="notify-hint">
+  <div class="notify-hint-icon">🔔</div>
+  <div class="notify-hint-text">
+    <strong>下单即通知 TA</strong>
+    点单提交后，男朋友会立刻收到通知，马上帮你安排～
+  </div>
+</div>
+
+<!-- History button -->
+<div class="history-btn" onclick="openHistory()">
+  📋 查看我的点单记录
+</div>
+
+<!-- Category tabs -->
+<div class="cat-tabs" id="catTabs">
+  <div class="cat-tab active" onclick="filterCat('all', this)">全部</div>
+  <div class="cat-tab" onclick="filterCat('drink', this)">☕ 饮品</div>
+  <div class="cat-tab" onclick="filterCat('food', this)">🍱 美食</div>
+  <div class="cat-tab" onclick="filterCat('sweet', this)">🍰 甜品零食</div>
+  <div class="cat-tab" onclick="filterCat('activity', this)">🎡 活动娱乐</div>
+  <div class="cat-tab" onclick="filterCat('care', this)">💆 宠爱放松</div>
+  <div class="cat-tab" onclick="filterCat('gift', this)">🎁 惊喜心意</div>
+</div>
+
+<!-- Items section -->
+<div class="section" id="itemsSection"></div>
+
+<div class="page-footer">用心为你做的每一份 ♡ 全部免费</div>
+
+<!-- Cart button -->
+<div class="cart-btn" onclick="openCart()">
+  <span class="cart-icon">🛒</span>
+  <span class="cart-count" id="cartCount">0</span>
+</div>
+
+<!-- Cart drawer -->
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+<div class="cart-drawer" id="cartDrawer">
+  <div class="cart-header">
+    <div class="cart-title">我的心愿单 💌</div>
+    <div class="cart-close" onclick="closeCart()">✕</div>
+  </div>
+  <div class="cart-items" id="cartItems">
+    <div class="cart-empty">
+      <span class="cart-empty-emoji">🛒</span>
+      还没有选哦，快去挑喜欢的～
+    </div>
+  </div>
+  <div class="note-section">
+    <div class="note-label">💬 留言给他</div>
+    <textarea class="note-input" id="orderNote" rows="2" placeholder="比如：想要草莓多一些～ 或者 今天想看你的笑脸"></textarea>
+  </div>
+  <div class="submit-section">
+    <button class="submit-btn" id="submitBtn" onclick="submitOrder()">✨ 提交心愿单</button>
+  </div>
+</div>
+
+<!-- Success modal -->
+<div class="success-modal" id="successModal">
+  <div class="success-box">
+    <span class="success-emoji">💌</span>
+    <div class="success-title">收到啦！</div>
+    <div class="success-msg">
+      他已经收到你的心愿单了<br>
+      正在赶来帮你安排中～<br>
+      <span style="font-size:18px;margin-top:8px;display:block">🌸✨🌸</span>
+    </div>
+    <div class="success-order-id" id="successOrderId"></div>
+    <button class="success-close" onclick="closeSuccess()">好嗒～</button>
+  </div>
+</div>
+
+<!-- History modal -->
+<div class="history-modal" id="historyModal" onclick="closeHistoryOutside(event)">
+  <div class="history-drawer">
+    <div class="history-header">
+      <div class="history-title">📋 点单记录</div>
+      <div class="cart-close" onclick="closeHistory()">✕</div>
+    </div>
+    <div class="history-list" id="historyList"></div>
+  </div>
+</div>
+
+<!-- Float hearts container -->
+<div class="float-hearts" id="floatHearts"></div>
+
+<script>
+const MENU = [
+  // 饮品
+  { id:1, cat:'drink', emoji:'🧋', name:'珍珠奶茶', desc:'浓香茶底，粒粒Q弹珍珠，甜度可调', badge:'最爱' },
+  { id:2, cat:'drink', emoji:'🍵', name:'抹茶拿铁', desc:'日式抹茶 + 绵密牛奶，微苦回甘' },
+  { id:3, cat:'drink', emoji:'☕', name:'焦糖玛奇朵', desc:'浓缩咖啡 + 焦糖糖浆，香甜温暖' },
+  { id:4, cat:'drink', emoji:'🍓', name:'草莓思慕雪', desc:'新鲜草莓 + 酸奶打成，清爽满口' },
+  { id:5, cat:'drink', emoji:'🍑', name:'蜜桃乌龙茶', desc:'水蜜桃香气与乌龙茶完美结合' },
+  { id:6, cat:'drink', emoji:'🥛', name:'玫瑰豆乳', desc:'玫瑰花香 × 香浓豆乳，美肌之选', badge:'新品' },
+  // 美食
+  { id:7, cat:'food', emoji:'🍜', name:'番茄牛腩面', desc:'慢炖牛腩，酸甜番茄浓汤，暖胃满足' },
+  { id:8, cat:'food', emoji:'🍱', name:'日式便当', desc:'三文鱼饭团 + 玉子烧 + 若干小菜' },
+  { id:9, cat:'food', emoji:'🥗', name:'凯撒沙拉', desc:'罗马生菜 + 培根碎 + 凯撒酱' },
+  { id:10, cat:'food', emoji:'🍕', name:'水果披萨', desc:'薄底披萨 + 新鲜草莓芒果，甜咸交织', badge:'人气' },
+  { id:11, cat:'food', emoji:'🥐', name:'牛角可颂', desc:'法式黄油酥皮，夹火腿奶酪或果酱' },
+  { id:12, cat:'food', emoji:'🍣', name:'精选寿司拼盘', desc:'三文鱼 / 金枪鱼 / 虾仁，共12贯' },
+  // 甜品零食
+  { id:13, cat:'sweet', emoji:'🍰', name:'草莓千层蛋糕', desc:'20层薄饼 × 鲜奶油 × 草莓，少女心满满', badge:'招牌' },
+  { id:14, cat:'sweet', emoji:'🧇', name:'格子松饼', desc:'配枫糖浆 + 水果 + 冰淇淋球，幸福味道' },
+  { id:15, cat:'sweet', emoji:'🍦', name:'双球冰淇淋', desc:'草莓 / 抹茶 / 香草，自选口味' },
+  { id:16, cat:'sweet', emoji:'🍫', name:'黑巧克力礼盒', desc:'比利时黑巧 × 6粒，附手写祝福卡' },
+  { id:17, cat:'sweet', emoji:'🍡', name:'草莓大福', desc:'糯米皮包红豆沙和草莓，日式和果子' },
+  { id:18, cat:'sweet', emoji:'🧁', name:'裱花纸杯蛋糕', desc:'玫瑰 / 爱心造型，好看又好吃' },
+  // 活动娱乐
+  { id:19, cat:'activity', emoji:'🎬', name:'电影之夜', desc:'挑一部你想看的，爆米花 + 抱枕全备好', badge:'限定' },
+  { id:20, cat:'activity', emoji:'🎮', name:'游戏对战', desc:'Switch / 手游，玩你喜欢的，输了请你吃糖' },
+  { id:21, cat:'activity', emoji:'🛍️', name:'陪逛街购物', desc:'全程拎包 + 只说好看 + 结账全包，随时出发' },
+  { id:22, cat:'activity', emoji:'🌅', name:'看日落', desc:'找个好地方一起看日落，带好喝的' },
+  { id:23, cat:'activity', emoji:'📸', name:'写真拍摄', desc:'帮你拍100张，精修10张，记录美好' },
+  { id:24, cat:'activity', emoji:'🎡', name:'游乐园一日游', desc:'坐旋转木马 + 吃棉花糖 + 所有费用全包', badge:'惊喜' },
+  { id:25, cat:'activity', emoji:'🍳', name:'学一道菜', desc:'一起去菜市场，他教你做一道拿手菜' },
+  { id:26, cat:'activity', emoji:'🎨', name:'手工DIY', desc:'陶艺 / 绘画 / 扎染，选你喜欢的工坊' },
+  // 宠爱放松
+  { id:27, cat:'care', emoji:'💆', name:'手部护理', desc:'精油按摩 + 补水护理，软嫩如初', badge:'宠爱' },
+  { id:28, cat:'care', emoji:'🛁', name:'泡澡套餐', desc:'准备好浴盐 + 蜡烛 + 你爱听的歌单' },
+  { id:29, cat:'care', emoji:'💅', name:'美甲陪伴', desc:'陪你去做美甲，等候全程在旁边' },
+  { id:30, cat:'care', emoji:'😴', name:'懒觉特权', desc:'周末睡到自然醒，早饭送到床边' },
+  { id:31, cat:'care', emoji:'🤗', name:'抱抱券', desc:'随时兑换，不限时长，不需要理由', badge:'无限' },
+  { id:32, cat:'care', emoji:'🌡️', name:'生病照料', desc:'熬粥 + 买药 + 陪伴，全程守护' },
+  // 惊喜心意
+  { id:33, cat:'gift', emoji:'💐', name:'鲜花一束', desc:'你喜欢的花，亲手送到你面前', badge:'浪漫' },
+  { id:34, cat:'gift', emoji:'📝', name:'手写情书', desc:'认真写满一页，只写给你看的' },
+  { id:35, cat:'gift', emoji:'🌟', name:'星空命名', desc:'以你的名字命名一颗星，附证书' },
+  { id:36, cat:'gift', emoji:'🎶', name:'专属歌单', desc:'精心挑选50首，每首都在说我爱你' },
+  { id:37, cat:'gift', emoji:'🍱', name:'爱心便当', desc:'亲手做的便当，里面有颗心形蛋包饭' },
+  { id:38, cat:'gift', emoji:'📷', name:'回忆相册', desc:'整理你们在一起的照片，做成精美相册' },
+];
+
+let cart = {};
+let orders = JSON.parse(localStorage.getItem('sweetOrders') || '[]');
+let currentCat = 'all';
+
+function filterCat(cat, el) {
+  currentCat = cat;
+  document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderItems();
+}
+
+function renderItems() {
+  const items = currentCat === 'all' ? MENU : MENU.filter(i => i.cat === currentCat);
+  const catLabels = { drink:'☕ 饮品', food:'🍱 美食', sweet:'🍰 甜品零食', activity:'🎡 活动娱乐', care:'💆 宠爱放松', gift:'🎁 惊喜心意' };
+  
+  let html = '';
+  if (currentCat === 'all') {
+    const cats = ['drink','food','sweet','activity','care','gift'];
+    cats.forEach(cat => {
+      const catItems = MENU.filter(i => i.cat === cat);
+      html += `<div class="section-title"><span>${catLabels[cat].split(' ')[0]}</span>${catLabels[cat].split(' ').slice(1).join(' ')}</div>`;
+      html += '<div class="items-grid">';
+      catItems.forEach(item => { html += renderItemCard(item); });
+      html += '</div>';
+    });
+  } else {
+    html += '<div class="items-grid">';
+    items.forEach(item => { html += renderItemCard(item); });
+    html += '</div>';
+  }
+  document.getElementById('itemsSection').innerHTML = html;
+}
+
+function renderItemCard(item) {
+  const qty = cart[item.id] || 0;
+  const selected = qty > 0 ? 'item-selected' : '';
+  const badge = item.badge ? `<div class="item-badge">${item.badge}</div>` : '';
+  const qtyCtrl = qty > 0
+    ? `<div class="item-qty">
+        <div class="item-minus-btn" onclick="changeQty(${item.id},-1,event)">−</div>
+        <div class="item-qty-num">${qty}</div>
+        <div class="item-add-sm" onclick="changeQty(${item.id},1,event)">+</div>
+       </div>`
+    : `<div class="item-add-btn" onclick="changeQty(${item.id},1,event)">+</div>`;
+  return `
+    <div class="item-card ${selected}" id="card-${item.id}">
+      ${badge}
+      <span class="item-emoji">${item.emoji}</span>
+      <div class="item-name">${item.name}</div>
+      <div class="item-desc">${item.desc}</div>
+      <div class="item-footer">
+        <div class="item-free">免费 ♡</div>
+        ${qtyCtrl}
+      </div>
+    </div>`;
+}
+
+function changeQty(id, delta, e) {
+  e && e.stopPropagation();
+  const item = MENU.find(i => i.id === id);
+  cart[id] = Math.max(0, (cart[id] || 0) + delta);
+  if (cart[id] === 0) delete cart[id];
+  updateCartBadge();
+  // Re-render just this card
+  const card = document.getElementById('card-' + id);
+  if (card) {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = renderItemCard(item);
+    card.replaceWith(tmp.firstElementChild);
+  }
+  // Spawn hearts when adding
+  if (delta > 0 && e) spawnHearts(e.clientX, e.clientY);
+}
+
+function updateCartBadge() {
+  const total = Object.values(cart).reduce((a,b) => a+b, 0);
+  const badge = document.getElementById('cartCount');
+  if (total > 0) {
+    badge.style.display = 'flex';
+    badge.textContent = total;
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+function spawnHearts(x, y) {
+  const container = document.getElementById('floatHearts');
+  const hearts = ['♡','♥','💕','💖'];
+  for (let i = 0; i < 3; i++) {
+    const h = document.createElement('div');
+    h.className = 'float-heart';
+    h.textContent = hearts[Math.floor(Math.random()*hearts.length)];
+    h.style.left = (x + (Math.random()-0.5)*40) + 'px';
+    h.style.top = y + 'px';
+    h.style.animationDelay = (i * 0.12) + 's';
+    container.appendChild(h);
+    setTimeout(() => h.remove(), 1500);
+  }
+}
+
+function openCart() {
+  renderCartItems();
+  document.getElementById('cartOverlay').classList.add('show');
+  document.getElementById('cartDrawer').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeCart() {
+  document.getElementById('cartOverlay').classList.remove('show');
+  document.getElementById('cartDrawer').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+function renderCartItems() {
+  const keys = Object.keys(cart);
+  if (keys.length === 0) {
+    document.getElementById('cartItems').innerHTML = `
+      <div class="cart-empty">
+        <span class="cart-empty-emoji">🛒</span>
+        还没有选哦，快去挑喜欢的～
+      </div>`;
+    document.getElementById('submitBtn').disabled = true;
+    return;
+  }
+  document.getElementById('submitBtn').disabled = false;
+  let html = '';
+  keys.forEach(id => {
+    const item = MENU.find(i => i.id == id);
+    if (!item) return;
+    html += `
+      <div class="cart-item">
+        <div class="cart-item-emoji">${item.emoji}</div>
+        <div class="cart-item-info">
+          <div class="cart-item-name">${item.name}</div>
+          <div class="cart-item-sub">${item.desc.substring(0,20)}...</div>
+        </div>
+        <div class="item-qty">
+          <div class="item-minus-btn" onclick="changeQtyFromCart(${id},-1)">−</div>
+          <div class="item-qty-num" style="font-size:15px">${cart[id]}</div>
+          <div class="item-add-sm" onclick="changeQtyFromCart(${id},1)">+</div>
+        </div>
+      </div>`;
+  });
+  document.getElementById('cartItems').innerHTML = html;
+}
+
+function changeQtyFromCart(id, delta) {
+  cart[id] = Math.max(0, (cart[id]||0) + delta);
+  if (cart[id] === 0) delete cart[id];
+  updateCartBadge();
+  renderCartItems();
+  // Update card in background
+  const item = MENU.find(i => i.id == id);
+  const card = document.getElementById('card-' + id);
+  if (card && item) {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = renderItemCard(item);
+    card.replaceWith(tmp.firstElementChild);
+  }
+}
+
+function submitOrder() {
+  const keys = Object.keys(cart);
+  if (keys.length === 0) return;
+  const note = document.getElementById('orderNote').value.trim();
+  const itemList = keys.map(id => {
+    const item = MENU.find(i => i.id == id);
+    return `${item.emoji}${item.name}×${cart[id]}`;
+  });
+  const orderId = 'WISH' + Date.now().toString().slice(-6);
+  const now = new Date();
+  const timeStr = now.toLocaleDateString('zh-CN') + ' ' + now.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});
+  const order = { id: orderId, items: itemList, note, time: timeStr };
+  orders.unshift(order);
+  if (orders.length > 30) orders = orders.slice(0,30);
+  localStorage.setItem('sweetOrders', JSON.stringify(orders));
+
+  // Trigger notification (browser notification API)
+  sendNotification(order);
+
+  // Reset
+  cart = {};
+  updateCartBadge();
+  renderItems();
+  closeCart();
+  document.getElementById('orderNote').value = '';
+
+  // Show success
+  document.getElementById('successOrderId').textContent = '订单号：' + orderId;
+  document.getElementById('successModal').classList.add('show');
+}
+
+function sendNotification(order) {
+  // Try to show browser notification (requires permission)
+  if ('Notification' in window) {
+    const doNotify = () => {
+      new Notification('💌 新心愿单！', {
+        body: '她点了：' + order.items.join('、') + (order.note ? '\n留言：' + order.note : ''),
+        icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">💌</text></svg>',
+        tag: order.id
+      });
+    };
+    if (Notification.permission === 'granted') {
+      doNotify();
+    } else if (Notification.permission !== 'denied') {
+      Notification.requestPermission().then(p => { if (p === 'granted') doNotify(); });
+    }
+  }
+}
+
+function closeSuccess() {
+  document.getElementById('successModal').classList.remove('show');
+}
+
+function openHistory() {
+  renderHistory();
+  document.getElementById('historyModal').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeHistory() {
+  document.getElementById('historyModal').classList.remove('show');
+  document.body.style.overflow = '';
+}
+function closeHistoryOutside(e) {
+  if (e.target === document.getElementById('historyModal')) closeHistory();
+}
+
+function renderHistory() {
+  if (orders.length === 0) {
+    document.getElementById('historyList').innerHTML = `
+      <div class="cart-empty" style="padding:40px">
+        <span class="cart-empty-emoji">📋</span>
+        还没有点过单哦，快去挑喜欢的～
+      </div>`;
+    return;
+  }
+  let html = '';
+  orders.forEach(o => {
+    html += `
+      <div class="history-record">
+        <div class="history-record-top">
+          <span class="history-record-id">${o.id}</span>
+          <span class="status-badge">已送达 TA</span>
+        </div>
+        <div class="history-record-time" style="margin-bottom:6px">🕐 ${o.time}</div>
+        <div class="history-record-items">${o.items.join('　')}</div>
+        ${o.note ? `<div class="history-record-note">💬 "${o.note}"</div>` : ''}
+      </div>`;
+  });
+  document.getElementById('historyList').innerHTML = html;
+}
+
+// Request notification permission on load
+window.addEventListener('load', () => {
+  renderItems();
+  if ('Notification' in window && Notification.permission === 'default') {
+    setTimeout(() => {
+      Notification.requestPermission();
+    }, 3000);
+  }
+});
+</script>
+</body>
+</html>

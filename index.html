@@ -964,7 +964,7 @@
     <div class="admin-section">
       <div class="admin-section-title">🔔 微信通知设置</div>
       <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;line-height:1.6">
-        她点单后，你的微信立刻收到消息提醒！<br>
+        她点单后，你的微信/iPhone立刻收到消息提醒！<br>
         👉 <a href="https://sct.ftqq.com" target="_blank" style="color:var(--pink);font-weight:600">点此用微信扫码登录Server酱</a>，复制 SendKey 粘贴到下面
       </div>
       <div class="admin-label">Server酱 SendKey</div>
@@ -983,6 +983,18 @@
         </div>
         <button class="admin-btn admin-btn-secondary" onclick="saveBarkKey()">保存 Bark 设置</button>
         <button class="admin-btn admin-btn-secondary" onclick="testBarkKey()">🔔 测试 Bark 通知</button>
+      </div>
+
+      <div style="margin-top:16px;padding-top:14px;border-top:1px dashed var(--pink-mid);background:var(--pink-light);padding:14px;border-radius:12px;margin-left:-4px;margin-right:-4px">
+        <div style="font-size:14px;font-weight:600;color:var(--pink-dark);margin-bottom:6px">🚀 部署更新到线上</div>
+        <div style="font-size:11px;color:var(--text-muted);line-height:1.6;margin-bottom:10px">
+          ⚠️ 保存配置后，必须部署到线上才能生效！<br>
+          否则她打开页面时推送Key不在代码里，通知发不出来。
+        </div>
+        <div class="admin-label">GitHub Token（部署用）</div>
+        <input class="admin-input" id="adminGithubToken" placeholder="ghp_ 开头的 GitHub Token" autocomplete="off">
+        <button class="admin-btn admin-btn-primary" onclick="deployToGithub()" id="deployBtn">🚀 部署更新</button>
+        <div id="deployStatus" style="font-size:12px;margin-top:8px;display:none"></div>
       </div>
     </div>
 
@@ -1082,6 +1094,13 @@ const DEFAULT_MENU = [
 ];
 
 const ADMIN_PWD = '286888';
+
+// 通知推送配置（写死在代码里，确保任何人点单都能推送到你手机）
+// ⚠️ 在管理页配置后，Key 会自动保存到此处
+const NOTIFICATION_CONFIG = {
+  serverChanKey: 'SCT355928Tcq90mMREFbsVUKNTGL8ifCWF',  // Server酱 SendKey，如 SCTxxx...
+  barkKey: ''         // Bark Key（iPhone推送）
+};
 const CAT_LABELS = { drink:'☕ 饮品', food:'🍱 美食', sweet:'🍰 甜品零食', activity:'🎡 活动娱乐', care:'💆 宠爱放松', gift:'🎁 惊喜心意' };
 const EMOJIS = ['🧋','🍵','☕','🍓','🍑','🥛','🧃','🍷','🥤','🍋','🍜','🍱','🥗','🍕','🥐','🍣','🍔','🥘','🍰','🧇','🍦','🍫','🍡','🧁','🍪','🥧','🎂','🎬','🎮','🛍️','🌅','📸','🎡','🍳','🎨','⛺','🎪','💆','🛁','💅','😴','🤗','🌡️','🧸','💐','📝','🌟','🎶','🍱','📷','🎁','💝','🎈','🎀','💍','🧧','💌','🪄'];
 
@@ -1321,8 +1340,11 @@ function sendNotification(order) {
     else if (Notification.permission !== 'denied') Notification.requestPermission().then(p => { if (p === 'granted') doNotify(); });
   }
 
-  // 2. Server酱微信推送
-  const sendKey = localStorage.getItem('sweetSendKey');
+  // 2. 读取推送配置（优先从代码内置，兼容 localStorage）
+  const sendKey = NOTIFICATION_CONFIG.serverChanKey || localStorage.getItem('sweetSendKey');
+  const barkKey = NOTIFICATION_CONFIG.barkKey || localStorage.getItem('sweetBarkKey');
+
+  // 3. Server酱微信推送
   if (sendKey) {
     const title = '💌 新心愿单来啦！';
     const itemsText = order.items.join('\n');
@@ -1346,8 +1368,7 @@ function sendNotification(order) {
     });
   }
 
-  // 3. Bark推送（iOS，与Server酱独立，可同时启用）
-  const barkKey = localStorage.getItem('sweetBarkKey');
+  // 4. Bark推送（iOS）
   if (barkKey) {
     const barkTitle = '💌 新心愿单！';
     const barkBody = order.items.join(' ') + (order.note ? ' | ' + order.note : '');
@@ -1447,9 +1468,11 @@ function saveSendKey() {
   const key = document.getElementById('adminSendKey').value.trim();
   if (key) {
     localStorage.setItem('sweetSendKey', key);
-    alert('Server酱 SendKey 已保存！✅\n她下次点单你就能在微信收到通知了。');
+    NOTIFICATION_CONFIG.serverChanKey = key;
+    alert('Server酱 SendKey 已保存！✅\n\n⚠️ 重要：需要点击下方「🚀 部署更新」按钮，\n把配置推送到线上，她点单时才能收到通知！\n\n（配置只在你的手机本地保存是不够的，\n需要更新到网页代码里才行）');
   } else {
     localStorage.removeItem('sweetSendKey');
+    NOTIFICATION_CONFIG.serverChanKey = '';
     alert('已清除 Server酱 设置。');
   }
 }
@@ -1458,9 +1481,11 @@ function saveBarkKey() {
   const key = document.getElementById('adminBarkKey').value.trim();
   if (key) {
     localStorage.setItem('sweetBarkKey', key);
-    alert('Bark Key 已保存！✅');
+    NOTIFICATION_CONFIG.barkKey = key;
+    alert('Bark Key 已保存！✅\n\n⚠️ 重要：需要点击下方「🚀 部署更新」按钮，\n把配置推送到线上，她点单时才能收到通知！');
   } else {
     localStorage.removeItem('sweetBarkKey');
+    NOTIFICATION_CONFIG.barkKey = '';
     alert('已清除 Bark 设置。');
   }
 }
@@ -1472,6 +1497,7 @@ function testBarkKey() {
     return;
   }
   localStorage.setItem('sweetBarkKey', key);
+  NOTIFICATION_CONFIG.barkKey = key;
 
   const barkTitle = '🔔 Bark通知测试成功！';
   const barkBody = '你的专属点单小程序已成功连接Bark推送！以后她点单你都会收到通知 ♡';
@@ -1484,8 +1510,86 @@ function testBarkKey() {
       alert('发送失败 😥\n错误信息：' + (data.message || JSON.stringify(data)) + '\n\n请检查 Bark Key 是否正确。');
     }
   }).catch(err => {
-    alert('网络请求失败 😥\n请检查网络连接和 Bark Key 是否正确。');
+    alert('网络请求失败 😥\n可能原因：\n1. Bark Key 格式不对（只需要 key 部分，不要带 https://api.day.app/）\n2. 网络连接问题');
   });
+}
+
+function deployToGithub() {
+  const token = document.getElementById('adminGithubToken').value.trim();
+  if (!token) {
+    alert('请输入 GitHub Token（ghp_ 开头）\n\n获取方式：\n1. 登录 github.com\n2. Settings → Developer settings → Personal access tokens\n3. Generate new token (classic)\n4. 勾选 repo 权限');
+    return;
+  }
+
+  // Save current config
+  const sendKey = document.getElementById('adminSendKey').value.trim();
+  const barkKey = document.getElementById('adminBarkKey').value.trim();
+  if (sendKey) NOTIFICATION_CONFIG.serverChanKey = sendKey;
+  if (barkKey) NOTIFICATION_CONFIG.barkKey = barkKey;
+
+  const statusEl = document.getElementById('deployStatus');
+  const deployBtn = document.getElementById('deployBtn');
+  statusEl.style.display = 'block';
+  statusEl.style.color = 'var(--purple)';
+  statusEl.textContent = '⏳ 正在部署...';
+  deployBtn.disabled = true;
+
+  const USER = 'huangmingbin718';
+  const REPO = 'sweetheart-order';
+  const headers = {
+    'Authorization': 'token ' + token,
+    'Accept': 'application/vnd.github.v3+json'
+  };
+
+  // Step 1: Get current file
+  fetch('https://api.github.com/repos/' + USER + '/' + REPO + '/contents/index.html', { headers })
+    .then(r => r.json())
+    .then(data => {
+      if (!data.sha) throw new Error('获取文件失败：' + (data.message || '未知错误'));
+
+      // Step 2: Modify the HTML content - update NOTIFICATION_CONFIG in the code
+      let html = atob(data.content.replace(/\n/g, ''));
+      
+      // Replace the config values
+      html = html.replace(
+        /serverChanKey:\s*'[^']*'/,
+        "serverChanKey: '" + (NOTIFICATION_CONFIG.serverChanKey || '') + "'"
+      );
+      html = html.replace(
+        /barkKey:\s*'[^']*'/,
+        "barkKey: ''') + "'"
+      );
+
+      // Step 3: Push updated file
+      const b64 = btoa(unescape(encodeURIComponent(html)));
+      return fetch('https://api.github.com/repos/' + USER + '/' + REPO + '/contents/index.html', {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify({
+          message: 'Update notification config',
+          content: b64,
+          sha: data.sha
+        })
+      });
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.commit) {
+        statusEl.style.color = '#22c55e';
+        statusEl.textContent = '✅ 部署成功！等1-2分钟线上页面更新后，她点单就能收到通知了。';
+        alert('🚀 部署成功！✅\n\n等1-2分钟 GitHub Pages 缓存刷新后：\n1. 让她重新打开点单链接\n2. 点一单试试\n3. 你的微信/iPhone 应该就能收到通知了！');
+      } else {
+        throw new Error(data.message || '推送失败');
+      }
+    })
+    .catch(err => {
+      statusEl.style.color = '#ef4444';
+      statusEl.textContent = '❌ 部署失败：' + err.message;
+      alert('部署失败 😥\n错误：' + err.message + '\n\n请检查 GitHub Token 是否正确且勾选了 repo 权限。');
+    })
+    .finally(() => {
+      deployBtn.disabled = false;
+    });
 }
 
 function testSendKey() {
